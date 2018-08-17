@@ -1,1 +1,6 @@
 dist
+__pycache__
+build
+.idea
+*.txt*
+.DS_Store
