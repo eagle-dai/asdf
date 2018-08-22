@@ -28,17 +28,17 @@ class Mission(object):
             else:
                 if d == 1:
                     if self.reach_right(pos[0]):
-                        ops_util.left_fight(400)
+                        ops_util.left_fight(400,self.ft.finish)
                         return 0
                     else:
-                        ops_util.right_fight(400)
+                        ops_util.right_fight(400,self.ft.finish)
                         return 1
                 else:
                     if self.reach_left(pos[0]):
-                        ops_util.right_fight(400)
+                        ops_util.right_fight(400,self.ft.finish)
                         return 1
                     else:
-                        ops_util.left_fight(400)
+                        ops_util.left_fight(400,self.ft.finish)
                         return 0
 
     def fight(self):
@@ -48,14 +48,14 @@ class Mission(object):
         pos = ops_util.go_middle_v2()
         if len(pos) > 0 and ops_util.cx(pos[0]) > 400:
             d = 0
-            ops_util.left_v3(30)
+            ops_util.left_v2(30)
         else:
-            ops_util.right_v3(30)
+            ops_util.right_v2(30)
         while gcf.Gcfg.running:
             d = self.fight_circle(d)
             # if self.ft.mexy==None or self.ft.mexy != (10, 10):
             #     self.pick_item()
-            ops_util.go_middle_v2()
+            # ops_util.go_middle_v2()
             if d== -1:
                 break
 
@@ -92,25 +92,58 @@ class Mission(object):
         pos = ac.find_all_template(img, mcfg.ITEM, threshold=0.95, rgb=False, bgremove=False)
         for p in pos:
             ops_util.goto_xy(p['result'][0] - 20, p['result'][1] + 250 - 100)
-            kb_util.skill('x',4)
+            kb_util.skill('x',2)
+
+    def pick_item_v2(self,door):
+        while gcf.Gcfg.running:
+            pos = ops_util.where_am_i()
+            if door == 'l'or door=='u' or door=='d':
+                if self.reach_right(pos[0]):
+                    break
+                else:
+                    ops_util.right_v3(200)
+            else:
+                if self.reach_left(pos[0]):
+                    break
+                else:
+                    ops_util.left_v3(200)
+
+        while gcf.Gcfg.running:
+            img=capture_param(0,250,800,300)
+            pos = ac.find_all_template(img, mcfg.ITEM, threshold=0.95, rgb=False, bgremove=False)
+            for p in pos:
+                ops_util.goto_xy(p['result'][0] - 20, p['result'][1] + 250 - 100)
+                kb_util.skill('x',2)
+
+            pos = ops_util.where_am_i()
+            if door == 'l'or door=='u' or door=='d':
+                if self.reach_left(pos[0]):
+                    break
+                else:
+                    ops_util.left_v3(600)
+            else:
+                if self.reach_right(pos[0]):
+                    break
+                else:
+                    ops_util.right_v3(600)
 
 
     def goto_x(self,p):
         cp=ops_util.where_am_i()[0]
         dx=ops_util.cx(cp)-ops_util.cx(p)
         if dx>0:
-            ops_util.left_v3(dx)
+            ops_util.left_v2(dx)
         else:
-            ops_util.right_v3(-dx)
+            ops_util.right_v2(-dx)
 
     def goto_y(self,p):
         cp=ops_util.where_am_i()[0]
         # dy=ops_util.cy(cp)-ops_util.cy(p)-210
         dy=ops_util.cy(cp)-ops_util.cy(p)-60
         if dy>0:
-            ops_util.up_v3(dy)
+            ops_util.up_v2(dy)
         else:
-            ops_util.down_v3(-dy)
+            ops_util.down_v2(-dy)
 
     def reach_next_room(self,index):
         if len(ops_util.in_esc())>0:
@@ -310,7 +343,7 @@ def destroy_item():
         pos=click_until(qpos,mcfg.CLEAR_CONFIRM)
         pos=click_until_null(mcfg.CLEAR_CONFIRM)
         time.sleep(3)
-        ops_util.esc_clear()
+        ops_util.clear_menu()
         break
 
 def destroy_item_v2():
@@ -321,11 +354,16 @@ def destroy_item_v2():
         time.sleep(0.5)
         kb_util.space(1,0.1)
         time.sleep(0.5)
+        img = capture_main()
+        endpos = ac.find_all_template(img, mcfg.ITEM_QUANBUFENJIE, threshold=0.85)
+        pos = click_until_down(pos,mcfg.ITEM_FENJIE1)
+        click_until_null(mcfg.ITEM_XIYOU, 0.95)
+        click_until_null(mcfg.ITEM_WODE, 0.98)
         kb_util.skill('a',delay=0.1)
         time.sleep(0.5)
         clear_confirm()
         time.sleep(3)
-        ops_util.esc_clear()
+        ops_util.clear_menu()
         break
 
 
@@ -338,7 +376,7 @@ def fix_item():
         kb_util.skill('s',delay=0.1)
         time.sleep(0.5)
         clear_confirm()
-        ops_util.esc_clear()
+        ops_util.clear_menu()
         break
 
 
@@ -417,7 +455,11 @@ if __name__ == "__main__":
     ops_util.clear_menu()
     if not ops_util.in_home():
         ops_util.go_home()
-    ops_util.clear_menu()
+        while gcf.Gcfg.running:
+            if ops_util.in_home_v2():
+                break
+            time.sleep(0.2)
+        ops_util.clear_menu()
     screen.gen_speed()
     logging.info("speed:%d,%d", mcfg.SPEED_X,mcfg.SPEED_Y)
 

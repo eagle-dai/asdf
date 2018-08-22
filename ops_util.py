@@ -46,7 +46,7 @@ def clear_space():
             break
         for p in pos:
             logging.info("clear one space:%s", pos)
-            kb_util.space(4)
+            kb_util.space(2,0.1)
 
 def clear_finish():
     while gcf.Gcfg.running:
@@ -201,40 +201,36 @@ def left_v3(step):
     pyautogui.keyDown("left", 0.01)
     pyautogui.keyUp("left", 0.01)
 
-def left_fight(step):
-    skill_cycle('l')
+def left_fight(step,done):
+    if not done:
+        skill_cycle('l')
     s=time.time()
     pyautogui.keyDown("left", 0.01)
     pyautogui.keyDown("up", 0.01)
     while True:
-        # pyautogui.keyDown("left", 0.1)
-        # pyautogui.keyDown("up", 0.1)
         if time.time() - s >= step/mcfg.SPEED_X/4:
             break
     pyautogui.keyUp("up", 0.01)
     pyautogui.keyDown("left", 0.01)
     pyautogui.keyUp("left", 0.01)
-
-    skill_cycle('l')
+    if not done:
+        skill_cycle('l')
     s=time.time()
     pyautogui.keyDown("left", 0.01)
     pyautogui.keyDown("down", 0.01)
     while True:
-        # pyautogui.keyDown("left", 0.1)
-        # pyautogui.keyDown("up", 0.1)
         if time.time() - s >= step / mcfg.SPEED_X / 2:
             break
     pyautogui.keyUp("down", 0.01)
     pyautogui.keyDown("left", 0.01)
     pyautogui.keyUp("left", 0.01)
 
-    skill_cycle('l')
+    if not done:
+        skill_cycle('l')
     s=time.time()
     pyautogui.keyDown("left", 0.01)
     pyautogui.keyDown("up", 0.01)
     while True:
-        # pyautogui.keyDown("left", 0.1)
-        # pyautogui.keyDown("up", 0.1)
         if time.time() - s >= step / mcfg.SPEED_X / 4:
             break
     pyautogui.keyUp("up", 0.01)
@@ -283,8 +279,9 @@ def right_v3(step):
     pyautogui.keyUp("right", 0.01)
 
 
-def right_fight(step):
-    skill_cycle('r')
+def right_fight(step,done):
+    if not done:
+        skill_cycle('r')
     s=time.time()
     pyautogui.keyDown("right", 0.01)
     pyautogui.keyDown("up", 0.01)
@@ -295,7 +292,8 @@ def right_fight(step):
     pyautogui.keyDown("right", 0.01)
     pyautogui.keyUp("right", 0.01)
 
-    skill_cycle('r')
+    if not done:
+        skill_cycle('r')
     s=time.time()
     pyautogui.keyDown("right", 0.01)
     pyautogui.keyDown("down", 0.01)
@@ -306,7 +304,8 @@ def right_fight(step):
     pyautogui.keyDown("right", 0.01)
     pyautogui.keyUp("right", 0.01)
 
-    skill_cycle('r')
+    if not done:
+        skill_cycle('r')
     s=time.time()
     pyautogui.keyDown("right", 0.01)
     pyautogui.keyDown("up", 0.01)
@@ -511,9 +510,9 @@ def skill_cycle(direction='n'):
     kb_util.skill('d', 1, delay=0.1)
     kb_util.skill('x', 5, delay=0.1)
     if direction=='r':
-        right_v2(60)
+        right_v2(80)
     elif direction=='l':
-        left_v2(60)
+        left_v2(0)
     kb_util.skill('s', 1, delay=0.1)
     kb_util.skill('x', 5, delay=0.1)
 
@@ -556,14 +555,16 @@ def middle_v2(pos):
         if cy(pos[0]) > mcfg.FIGHT_MIDDLE:
             up(cy(pos[0]) - mcfg.FIGHT_MIDDLE)
         elif cy(pos[0]) < mcfg.FIGHT_MIDDLE:
-            down(mcfg.FIGHT_MIDDLE - cy(pos[0])+20)
+            # down(mcfg.FIGHT_MIDDLE - cy(pos[0])+20)
+            down(mcfg.FIGHT_MIDDLE - cy(pos[0]))
 
 def middle_v2_p(pos):
     if pos!=None:
         if cy(pos) > mcfg.FIGHT_MIDDLE:
             up(cy(pos) - mcfg.FIGHT_MIDDLE)
         elif cy(pos) < mcfg.FIGHT_MIDDLE:
-            down(mcfg.FIGHT_MIDDLE - cy(pos)+20)
+            # down(mcfg.FIGHT_MIDDLE - cy(pos)+20)
+            down(mcfg.FIGHT_MIDDLE - cy(pos))
 
 
 def go_middle():
@@ -608,7 +609,7 @@ def main_task():
         return task
 
     while gcf.Gcfg.running:
-        esc_clear()
+        # esc_clear()
         posz = None
         while gcf.Gcfg.running:
             kb_util.f1(delay=0.5)
@@ -631,7 +632,8 @@ def main_task():
             if len(posz) == 1:
                 logging.info("main task find:%d,%s", len(posz), posz)
                 break
-            esc_clear()
+            # esc_clear()
+            clear_menu()
 
         while gcf.Gcfg.running:
             ms_util.click_first(posz)
@@ -644,7 +646,8 @@ def main_task():
             clear_confirm()
             time.sleep(1)
 
-        esc_clear()
+        # esc_clear()
+        clear_menu()
         posq = find_pos_main('direction', 'qianjin.png')
         logging.debug("direction:%d,%s", len(posq), posq)
         if len(posq) == 1:
@@ -1031,9 +1034,10 @@ def finish_yiwancheng():
     logging.debug("yiwancheng task:%d,%s", len(posz), posz)
     if len(posz) == 1:
         ms_util.click_first(posz)
-        kb_util.space(4,0.1)
-    time.sleep(0.5)
-    clear_confirm()
+        clear_space()
+        # kb_util.space(10,0.1)
+        # time.sleep(0.5)
+        clear_confirm()
 
 
 def wait_till_next_mission():

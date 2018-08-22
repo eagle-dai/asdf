@@ -109,7 +109,7 @@ def position_me():
             7 * mcfg.MINI_MAP_SLOT_SIZE
         )
         pos = ac.find_all_template(img, mcfg.ME4X10, threshold=0.8, rgb=False, bgremove=False)
-        logging.debug("postion me:%d,%s", len(pos), pos)
+        # logging.debug("postion me:%d,%s", len(pos), pos)
         if len(pos)>0:
             return pos[0]
 
@@ -214,7 +214,7 @@ def check_path():
         mdlu = cv2.imread(ops_util.resource_path('task', 'mdlu.png'))
 
 
-        pmff = ac.find_all_template(diff, mff, threshold=0.90, rgb=False, bgremove=False)
+        pmff = ac.find_all_template(diff, mff, threshold=0.80, rgb=False, bgremove=False)
         logging.debug("pmff %d,%s", len(pmff), pmff)
         pmlr = ac.find_all_template(diff, mlr, threshold=0.90, rgb=False, bgremove=False)
         logging.debug("pmlr %d,%s", len(pmlr), pmlr)
