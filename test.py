@@ -4,7 +4,7 @@ import aircv as ac
 import numpy as np
 import cv2
 import os
-
+import ops_util
 
 #pyautogui.moveTo(30, 30)
 #pyautogui.click(30 ,30)
@@ -70,3 +70,6 @@ print(pos)
 # we can then load our screenshot from disk in OpenCV format
 #image = cv2.imread("straight_to_disk.png")
 #cv2.imshow("Screenshot", imutils.resize(image, width=600))
+
+if __name__ == '__main__':
+    pass

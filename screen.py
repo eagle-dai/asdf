@@ -16,7 +16,7 @@ def gen_speed():
     pos1 = None
     pos2 = None
     while gcf.Gcfg.running:
-        pos1 = ops_util.find_pos_main('characters', 'my_pos.png')
+        pos1 = ops_util.find_my_pos()
         if len(pos1) == 1:
             break
     s = time.time()
@@ -27,7 +27,7 @@ def gen_speed():
     pyautogui.keyUp("down", 0.01)
     time.sleep(0.5)
     while gcf.Gcfg.running:
-        pos2 = ops_util.find_pos_main('characters', 'my_pos.png')
+        pos2 = ops_util.find_my_pos()
         if len(pos2) == 1:
             break
 
@@ -69,7 +69,7 @@ class Screen(object):
     def init_dummp():
         # Screen.X,Screen.Y = 600, 150
         # (667, 29, 126, 126)
-        Screen.X,Screen.Y = 12, 69
+        Screen.X,Screen.Y = 1751, 705
         Screen.W, Screen.D = 800, 600
         Screen.PX, Screen.PY = Screen.X + 667, Screen.Y+29
         Screen.PW, Screen.PD = 126, 126
@@ -77,20 +77,24 @@ class Screen(object):
 
 
 def focus():
-    ms_util.click(400, 1)
+    ms_util.click(400, 25)
 
+def focus_v2():
+    ms_util.click(400, 25)
 
 def direction(pos):
-    if pos[0]['result'][0] < 250:
+    # if pos[0]['result'][0] < 250:
+    if pos[0]['result'][0] < 120:
         return 0
 
-    if pos[0]['result'][0] > 550:
+    if pos[0]['result'][0] > 700:
+    # if pos[0]['result'][0] > 550:
         return 2
 
-    if pos[0]['result'][1] < 275:
+    if pos[0]['result'][1] < 440:
         return 1
 
-    if pos[0]['result'][1] > 325:
+    if pos[0]['result'][1] > 440:
         return 3
 
     return -1
@@ -107,11 +111,11 @@ def show(img, pos):
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
-    # Screen.init()
+    Screen.init()
     # exit(0)
-    Screen.init_dummp()
+    # Screen.init_dummp()
     focus()
-    Screen.gen_speed()
+    # Screen.gen_speed()
 
 
 

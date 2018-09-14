@@ -4,9 +4,9 @@ block_cipher = None
 
 
 a = Analysis(['ops.py'],
-             pathex=['C:\\Users\\pig\\PycharmProjects\\dnf'],
+             pathex=['C:\\Users\\win 10\\PycharmProjects\\asdf'],
              binaries=[],
-             datas=[('C:\\Users\\pig\\PycharmProjects\\dnf\\characters\\*.png','characters'),('C:\\Users\\pig\\PycharmProjects\\dnf\\clear\\*.png','clear'),('C:\\Users\\pig\\PycharmProjects\\dnf\\direction\\*.png','direction'),('C:\\Users\\pig\\PycharmProjects\\dnf\\home\\*.png','home'),('C:\\Users\\pig\\PycharmProjects\\dnf\\item\\*.png','item'),('C:\\Users\\pig\\PycharmProjects\\dnf\\screen\\*.png','screen'),('C:\\Users\\pig\\PycharmProjects\\dnf\\task\\*.png','task'),('C:\\Users\\pig\\PycharmProjects\\dnf\\conf\\*.conf','conf'),('C:\\Users\\pig\\PycharmProjects\\dnf\\city\\*.png','city'),('C:\\Users\\pig\\PycharmProjects\\dnf\\mission\\*.png','mission')],
+             datas=[('C:\\Users\\win 10\\PycharmProjects\\asdf\\characters\\*.png','characters'),('C:\\Users\\win 10\\PycharmProjects\\asdf\\clear\\*.png','clear'),('C:\\Users\\win 10\\PycharmProjects\\asdf\\direction\\*.png','direction'),('C:\\Users\\win 10\\PycharmProjects\\asdf\\home\\*.png','home'),('C:\\Users\\win 10\\PycharmProjects\\asdf\\item\\*.png','item'),('C:\\Users\\win 10\\PycharmProjects\\asdf\\screen\\*.png','screen'),('C:\\Users\\win 10\\PycharmProjects\\asdf\\task\\*.png','task'),('C:\\Users\\win 10\\PycharmProjects\\asdf\\conf\\*.conf','conf'),('C:\\Users\\win 10\\PycharmProjects\\asdf\\city\\*.png','city'),('C:\\Users\\win 10\\PycharmProjects\\asdf\\mission\\*.png','mission'),('C:\\Users\\win 10\\PycharmProjects\\asdf\\door\\*.png','door')],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],

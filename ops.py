@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import *
 import ctypes
-import win32con
 from ghk import GlobalHotKeys
 import _thread
 import game
@@ -9,6 +8,7 @@ import utils
 import logging
 from logging.config import fileConfig
 import gcf
+import loop
 
 
 class Application(tk.Frame):
@@ -84,7 +84,7 @@ class Application(tk.Frame):
     def gua_ji(self):
         logging.info("gua ji!")
         gcf.Gcfg.running = True
-        _thread.start_new_thread(game.start_guaji, ())
+        _thread.start_new_thread(loop.start_guaji, ())
 
     def stop(self):
         logging.info("stop!")
@@ -98,12 +98,12 @@ class Application(tk.Frame):
     def zhan_dou(self):
         logging.info("zhan dou!")
         gcf.Gcfg.running = True
-        _thread.start_new_thread(game.start_zhandou, ())
+        # _thread.start_new_thread(game.start_zhandou, ())
 
     def ji_xu(self):
         logging.info("ji xu!")
         gcf.Gcfg.running = True
-        _thread.start_new_thread(game.start_jixu, ())
+        # _thread.start_new_thread(game.start_jixu, ())
 
     def print_item(self, event):
         print(self.fb.get(self.fb.curselection()))

@@ -7,6 +7,7 @@ from utils import *
 import random
 import mcfg
 import nm
+import numpy as np
 
 def esc_1s():
     kb_util.esc(1, 0.3)
@@ -23,9 +24,22 @@ def in_esc():
     logging.debug("in_esc:%d,%s", len(pos), pos)
     return pos
 
+def in_space():
+    pos = find_pos_main('clear', 'kongge.png')
+    logging.debug("in_space:%d,%s", len(pos), pos)
+    return pos
+
+def in_confirm():
+    pos = find_pos_main('clear', 'confirm.png')
+    logging.debug("in_confirm:%d,%s", len(pos), pos)
+    return pos
+
 def clear_confirm():
     got=False
+    s=time.time()
     while gcf.Gcfg.running:
+        if time.time()-s>15:
+            break
         pos = find_pos_main('clear', 'confirm.png')
         logging.debug("clear_confirm:%d,%s", len(pos), pos)
         if len(pos) == 0:
@@ -35,10 +49,30 @@ def clear_confirm():
             logging.info("clear one confrim:%s", pos)
             ms_util.click_one(p)
             got=True
+
+    s = time.time()
+    while gcf.Gcfg.running:
+        if time.time()-s>15:
+            break
+        pos = find_pos_main('clear', 'xx.png')
+        logging.debug("clear_xx:%d,%s", len(pos), pos)
+        if len(pos) == 0:
+            logging.info("no xx")
+            break
+        for p in pos:
+            logging.info("clear one xx:%s", pos)
+            ms_util.click_one(p)
     return got
 
 def clear_space():
+    s=time.time()
+    s1=time.time()
     while gcf.Gcfg.running:
+        if time.time()-s1>5:
+            screen.focus()
+            s1=time.time()
+        if time.time()-s>15:
+            break
         pos = find_pos_main('clear', 'kongge.png')
         logging.debug("clear_space:%d,%s", len(pos), pos)
         if len(pos) == 0:
@@ -49,7 +83,14 @@ def clear_space():
             kb_util.space(2,0.1)
 
 def clear_finish():
+    s=time.time()
+    s1=time.time()
     while gcf.Gcfg.running:
+        if time.time()-s1>5:
+            screen.focus()
+            s1=time.time()
+        if time.time()-s>15:
+            break
         pos = find_pos_main('clear', 'wancheng.png')
         logging.debug("clear_finish:%d,%s", len(pos), pos)
         if len(pos) == 0:
@@ -57,11 +98,69 @@ def clear_finish():
             break
         for p in pos:
             logging.info("clear one finish:%s", pos)
-            ms_util.click_one(p)
+            kb_util.space(1,0.1)
+
+def clear_finish_space():
+    s=time.time()
+    while gcf.Gcfg.running:
+        if time.time()-s>15:
+            break
+        pos = find_pos_main('clear', 'wancheng.png')
+        logging.debug("clear_finish:%d,%s", len(pos), pos)
+        if len(pos) == 0:
+            logging.info("no finish")
+            break
+        for p in pos:
+            logging.info("clear one finish:%s", pos)
+            kb_util.space(1,0.1)
 
 def clear_menu():
     got_esc = False
+    s=time.time()
     while gcf.Gcfg.running:
+        if(time.time()-s>5):
+            screen.focus()
+            s=time.time()
+        pos = in_menu()
+        if len(pos) == 0 and got_esc == True:
+            logging.info("no menu")
+            break
+        if len(pos)>0:
+            got_esc = True
+        else:
+            clear_space()
+            clear_finish()
+            clear_confirm()
+        # screen.focus()
+        esc_1s()
+
+def clear_menu_no_finish():
+    got_esc = False
+    s=time.time()
+    while gcf.Gcfg.running:
+        if(time.time()-s>5):
+            screen.focus()
+            s=time.time()
+        pos = in_menu()
+        if len(pos) == 0 and got_esc == True:
+            logging.info("no menu")
+            break
+        if len(pos)>0:
+            got_esc = True
+        else:
+            clear_space()
+            clear_finish_space()
+            clear_confirm()
+        # screen.focus()
+        esc_1s()
+
+def clear_menu_with_focus():
+    got_esc = False
+    ts = time.time()
+    while gcf.Gcfg.running:
+        if time.time()-ts>15:
+            break
+        screen.focus()
         pos = in_menu()
         if len(pos) == 0 and got_esc == True:
             logging.info("no menu")
@@ -79,20 +178,41 @@ def sure_no_esc():
     if len(in_esc()) > 0:
         clear_menu()
 
+
 def sure_no_space():
     clear_space()
 
 def sure_no_menu():
+    s=time.time()
     while gcf.Gcfg.running:
+        if(time.time()-s>5):
+            screen.focus()
+            s=time.time()
         pos = find_pos_main('home', 'menu.png')
         if len(pos) == 0:
             logging.info("sure_no_menu")
             break
         esc_1s()
 
+def sure_no_task_menu():
+    s=time.time()
+    while gcf.Gcfg.running:
+        if(time.time()-s>5):
+            screen.focus()
+            s=time.time()
+        pos = find_pos_main('home', 'task_menu.png')
+        if len(pos) == 0:
+            logging.info("sure_no_task_menu")
+            break
+        esc_1s()
+
 def goto_menu():
     got_esc = False
+    s=time.time()
     while gcf.Gcfg.running:
+        if(time.time()-s>5):
+            screen.focus()
+            s=time.time()
         pos = in_menu()
         if len(pos)>0:
             got_esc = True
@@ -120,18 +240,25 @@ def go_home():
         #     logging.info("no train")
         #     break
 
+        s=time.time()
         while gcf.Gcfg.running:
+            if (time.time() - s > 5):
+                screen.focus()
+                s = time.time()
             esc_1s()
             clear_confirm()
             clear_finish()
             pos = in_menu()
             if len(pos) >= 1:
+                s=time.time()
                 while gcf.Gcfg.running:
+                    if (time.time() - s > 5):
+                        screen.focus()
+                        s = time.time()
                     logging.info("go to home")
                     ms_util.click_first(pos)
                     time.sleep(0.5)
                     clear_confirm()
-                    # return
                     posc = in_menu()
                     if len(posc) == 0:
                         return
@@ -164,10 +291,10 @@ def left_v2(step):
 
 
 def left_v3(step):
-    s=time.time()
 
     pyautogui.keyDown("left", 0.01)
     pyautogui.keyDown("up", 0.01)
+    s=time.time()
     while True:
         # pyautogui.keyDown("left", 0.1)
         # pyautogui.keyDown("up", 0.1)
@@ -201,41 +328,111 @@ def left_v3(step):
     pyautogui.keyDown("left", 0.01)
     pyautogui.keyUp("left", 0.01)
 
-def left_fight(step,done):
-    if not done:
-        skill_cycle('l')
-    s=time.time()
-    pyautogui.keyDown("left", 0.01)
+def right_fight(step,ft):
+    left_v2(20)
+    # pyautogui.keyDown("right", 0.01)
+    # pyautogui.keyUp("right", 0.01)
+    pyautogui.keyDown("right", 0.01)
     pyautogui.keyDown("up", 0.01)
+    s=time.time()
     while True:
         if time.time() - s >= step/mcfg.SPEED_X/4:
             break
+        if ft.finish:
+          break
     pyautogui.keyUp("up", 0.01)
-    pyautogui.keyDown("left", 0.01)
-    pyautogui.keyUp("left", 0.01)
-    if not done:
-        skill_cycle('l')
-    s=time.time()
-    pyautogui.keyDown("left", 0.01)
+    pyautogui.keyDown("right", 0.01)
+    pyautogui.keyUp("right", 0.01)
+    if not ft.finish:
+        skill_cycle_guijiansi('r',ft)
+    else:
+        return
+
+    pyautogui.keyDown("right", 0.01)
     pyautogui.keyDown("down", 0.01)
+    s=time.time()
     while True:
         if time.time() - s >= step / mcfg.SPEED_X / 2:
             break
+        if ft.finish:
+          break
     pyautogui.keyUp("down", 0.01)
-    pyautogui.keyDown("left", 0.01)
-    pyautogui.keyUp("left", 0.01)
+    pyautogui.keyDown("right", 0.01)
+    pyautogui.keyUp("right", 0.01)
+    if not ft.finish:
+        skill_cycle_guijiansi('r',ft)
+    else:
+        return
 
-    if not done:
-        skill_cycle('l')
-    s=time.time()
-    pyautogui.keyDown("left", 0.01)
+    pyautogui.keyDown("right", 0.01)
     pyautogui.keyDown("up", 0.01)
+    s=time.time()
     while True:
         if time.time() - s >= step / mcfg.SPEED_X / 4:
             break
+        if ft.finish:
+          break
+    pyautogui.keyUp("up", 0.01)
+    pyautogui.keyDown("right", 0.01)
+    pyautogui.keyUp("right", 0.01)
+    if not ft.finish:
+        skill_cycle_guijiansi('r',ft)
+    else:
+        return
+
+def left_fight(step,ft):
+    right_v2(20)
+    # pyautogui.keyDown("left", 0.01)
+    # pyautogui.keyUp("left", 0.01)
+
+    pyautogui.keyDown("left", 0.01)
+    pyautogui.keyDown("up", 0.01)
+    s=time.time()
+    while True:
+        if time.time() - s >= step/mcfg.SPEED_X/4:
+            break
+        if ft.finish:
+          break
     pyautogui.keyUp("up", 0.01)
     pyautogui.keyDown("left", 0.01)
     pyautogui.keyUp("left", 0.01)
+    if not ft.finish:
+        skill_cycle_guijiansi('l',ft)
+    else:
+        return
+
+
+    pyautogui.keyDown("left", 0.01)
+    pyautogui.keyDown("down", 0.01)
+    s=time.time()
+    while True:
+        if time.time() - s >= step / mcfg.SPEED_X / 2:
+            break
+        if ft.finish:
+          break
+    pyautogui.keyUp("down", 0.01)
+    pyautogui.keyDown("left", 0.01)
+    pyautogui.keyUp("left", 0.01)
+    if not ft.finish:
+        skill_cycle_guijiansi('l',ft)
+    else:
+        return
+
+    pyautogui.keyDown("left", 0.01)
+    pyautogui.keyDown("up", 0.01)
+    s=time.time()
+    while True:
+        if time.time() - s >= step / mcfg.SPEED_X / 4:
+            break
+        if ft.finish:
+          break
+    pyautogui.keyUp("up", 0.01)
+    pyautogui.keyDown("left", 0.01)
+    pyautogui.keyUp("left", 0.01)
+    if not ft.finish:
+        skill_cycle_guijiansi('l',ft)
+    else:
+        return
 
 def right_v2(step):
     s=time.time()
@@ -247,10 +444,10 @@ def right_v2(step):
 
 
 def right_v3(step):
-    s=time.time()
 
     pyautogui.keyDown("right", 0.01)
     pyautogui.keyDown("up", 0.01)
+    s=time.time()
     while True:
         if time.time() - s >= step/mcfg.SPEED_X/4:
             break
@@ -258,9 +455,9 @@ def right_v3(step):
     pyautogui.keyDown("right", 0.01)
     pyautogui.keyUp("right", 0.01)
 
-    s=time.time()
     pyautogui.keyDown("right", 0.01)
     pyautogui.keyDown("down", 0.01)
+    s=time.time()
     while True:
         if time.time() - s >= step / mcfg.SPEED_X / 2:
             break
@@ -268,9 +465,9 @@ def right_v3(step):
     pyautogui.keyDown("right", 0.01)
     pyautogui.keyUp("right", 0.01)
 
-    s=time.time()
     pyautogui.keyDown("right", 0.01)
     pyautogui.keyDown("up", 0.01)
+    s=time.time()
     while True:
         if time.time() - s >= step / mcfg.SPEED_X / 4:
             break
@@ -279,42 +476,7 @@ def right_v3(step):
     pyautogui.keyUp("right", 0.01)
 
 
-def right_fight(step,done):
-    if not done:
-        skill_cycle('r')
-    s=time.time()
-    pyautogui.keyDown("right", 0.01)
-    pyautogui.keyDown("up", 0.01)
-    while True:
-        if time.time() - s >= step/mcfg.SPEED_X/4:
-            break
-    pyautogui.keyUp("up", 0.01)
-    pyautogui.keyDown("right", 0.01)
-    pyautogui.keyUp("right", 0.01)
 
-    if not done:
-        skill_cycle('r')
-    s=time.time()
-    pyautogui.keyDown("right", 0.01)
-    pyautogui.keyDown("down", 0.01)
-    while True:
-        if time.time() - s >= step / mcfg.SPEED_X / 2:
-            break
-    pyautogui.keyUp("down", 0.01)
-    pyautogui.keyDown("right", 0.01)
-    pyautogui.keyUp("right", 0.01)
-
-    if not done:
-        skill_cycle('r')
-    s=time.time()
-    pyautogui.keyDown("right", 0.01)
-    pyautogui.keyDown("up", 0.01)
-    while True:
-        if time.time() - s >= step / mcfg.SPEED_X / 4:
-            break
-    pyautogui.keyUp("up", 0.01)
-    pyautogui.keyDown("right", 0.01)
-    pyautogui.keyUp("right", 0.01)
 
 def down_v2(step):
     s=time.time()
@@ -326,10 +488,10 @@ def down_v2(step):
     pyautogui.keyUp("down", 0.01)
 
 def down_v3(step):
-    s=time.time()
 
     pyautogui.keyDown("down", 0.01)
     pyautogui.keyDown("left", 0.01)
+    s=time.time()
     while True:
         if time.time() - s >= step/mcfg.SPEED_Y/4:
             break
@@ -337,9 +499,9 @@ def down_v3(step):
     pyautogui.keyDown("down", 0.01)
     pyautogui.keyUp("down", 0.01)
 
-    s=time.time()
     pyautogui.keyDown("down", 0.01)
     pyautogui.keyDown("right", 0.01)
+    s=time.time()
     while True:
         if time.time() - s >= step / mcfg.SPEED_Y / 2:
             break
@@ -347,9 +509,9 @@ def down_v3(step):
     pyautogui.keyDown("down", 0.01)
     pyautogui.keyUp("down", 0.01)
 
-    s=time.time()
     pyautogui.keyDown("down", 0.01)
     pyautogui.keyDown("left", 0.01)
+    s=time.time()
     while True:
         if time.time() - s >= step / mcfg.SPEED_Y / 4:
             break
@@ -361,7 +523,6 @@ def down_v3(step):
     pyautogui.keyUp("right", 0.01)
     # pyautogui.keyDown("left", 0.01)
     # pyautogui.keyUp("left", 0.01)
-
 
 
 
@@ -416,42 +577,33 @@ def read_pic(*args):
     return ac.imread(resource_path(*args))
 
 
-def direction(next, cur):
-    dx = cx(next) - cx(cur)
-    dy = cy(next) - cy(cur)
-    if abs(dx) < abs(dy):
-        if dy < 0:
-            return 1
-        else:
-            return 3
-    else:
-        if dx < 0:
-            return 0
-        else:
-            return 2
+# def direction(next, cur):
+#     dx = cx(next) - cx(cur)
+#     dy = cy(next) - cy(cur)
+#     if abs(dx) < abs(dy):
+#         if dy < 0:
+#             return 1
+#         else:
+#             return 3
+#     else:
+#         if dx < 0:
+#             return 0
+#         else:
+#             return 2
 
 
-def where_am_i():
+def where_am_i(d=None):
     c = 0
     m = 50
     diff = 200
     step = 20
     dw = False
     while gcf.Gcfg.running:
-        # kb_util.skill('enter', delay=0.1)
-        # for i in range(0, 2):
-        #     kb_util.skill('g', delay=0.05)
-        # kb_util.skill('enter', delay=0.1)
-        # time.sleep(0.2)
-        # pos = find_pos_main('home', 'gg_pos.png')
-        pos = find_pos_main('characters', 'my_pos.png')
-        # pos = find_pos_main('characters', 'm_fashi_pos_l2.png')
-        # if len(pos) == 0:
-        #     pos = find_pos_main('characters', 'm_fashi_pos_r2.png')
+        pos = find_my_pos()
         logging.debug("where_am_i:%d,%s", len(pos), pos)
         if len(pos) > 0:
             # middle(pos)
-            return pos
+            return my_pos_ajust(pos)
         sure_no_menu()
         sure_no_space()
         sure_no_esc()
@@ -467,15 +619,33 @@ def where_am_i():
         diff = diff - step
         if diff < 0:
             diff = 200
-        if c%2 == 0:
-            right_v2(diff)
+        if d!=None and d==0:
+            if c % 2 == 0:
+                left_v2(diff)
+            else:
+                right_v2(diff)
         else:
-            left_v2(diff)
+            if c%2 == 0:
+                right_v2(diff)
+            else:
+                left_v2(diff)
         c = c+1
-
         # if c > m:
         #     return pos
 
+
+def find_my_pos(td=0.65):
+    img = capture_main()
+    pos = ac.find_all_template(img, mcfg.MY_IMG, threshold=td)
+    return pos
+
+def my_pos_ajust(pos):
+    if len(pos) == 1:
+        ret = []
+        ret.append({})
+        ret[0]['result'] = [pos[0]['result'][0], pos[0]['result'][1] + 115]
+        return ret
+    return None
 
 def where_am_i_home(m=10):
     c = 0
@@ -483,11 +653,13 @@ def where_am_i_home(m=10):
     step = 40
     dw = False
     while gcf.Gcfg.running:
-        pos = find_pos_main('characters', 'my_pos.png',td=0.95)
+        pos = find_my_pos()
         logging.debug("where_am_i_home:%d,%s", len(pos), pos)
         if len(pos) == 1:
-            return pos
+            return my_pos_ajust(pos)
         sure_no_menu()
+        if not in_home_v2():
+            return None
         diff = diff - step
         if diff < 0:
             diff = 200
@@ -499,6 +671,8 @@ def where_am_i_home(m=10):
         if c > m:
             return pos
 
+
+
 def cx(pos):
     return pos['result'][0]
 
@@ -506,19 +680,54 @@ def cx(pos):
 def cy(pos):
     return pos['result'][1]
 
-def skill_cycle(direction='n'):
-    kb_util.skill('d', 1, delay=0.1)
-    kb_util.skill('x', 5, delay=0.1)
+def skill_cycle(direction='n',ft=None):
+    if ft.finish:
+        return
+    kb_util.skill('d', 1, delay=0.7)
+    if ft.finish:
+        return
+    kb_util.skill('x', 4, delay=0.2)
+    if ft.finish:
+        return
+    # if direction=='r':
+    #     right_v2(100)
+    # elif direction=='l':
+    #     left_v2(100)
+    if ft.finish:
+        return
+    kb_util.skill('s', 1, delay=0.3)
+    if ft.finish:
+        return
+    kb_util.skill('x', 4, delay=0.2)
+
+def skill_cycle_guijiansi(direction='n',ft=None):
+    if ft.finish:
+        return
+    kb_util.skill('d', 1, delay=0.05)
+    kb_util.skill('q', 1, delay=0.05)
+    time.sleep(0.6)
+    if ft.finish:
+        return
+    for i in range(0,4):
+        kb_util.skill('x', 1, delay=0.25)
+    if ft.finish:
+        return
     if direction=='r':
-        right_v2(80)
+        right_v2(40)
     elif direction=='l':
-        left_v2(0)
-    kb_util.skill('s', 1, delay=0.1)
-    kb_util.skill('x', 5, delay=0.1)
+        left_v2(40)
+    if ft.finish:
+        return
+    kb_util.skill('q', 1, delay=0.05)
+    kb_util.skill('d', 1, delay=0.05)
+    time.sleep(0.6)
+    if ft.finish:
+        return
+    for i in range(0,3):
+        kb_util.skill('x', 1, delay=0.25)
 
 def skill_cycle_s():
-    kb_util.skill('s', 1, delay=0.1)
-    kb_util.skill('x', 5, delay=0.1)
+    kb_util.skill('x', 4, delay=0.25)
 
 
 
@@ -550,7 +759,11 @@ def middle(pos):
         elif cy(pos[0]) < 330:
             down(325 - cy(pos[0]) + 15)
 
-def middle_v2(pos):
+def middle_v2(pos,d=None):
+    if d==0:
+        right_v2(20)
+    elif d==1:
+        left_v2(20)
     if len(pos) >= 1:
         if cy(pos[0]) > mcfg.FIGHT_MIDDLE:
             up(cy(pos[0]) - mcfg.FIGHT_MIDDLE)
@@ -582,18 +795,20 @@ def go_middle_v2():
     return pos
 
 
-def wait_loading():
+def wait_loading(char=None):
     while gcf.Gcfg.running:
         pos = find_pos_main( 'home', 'loading.png')
         logging.debug("loading:%d,%s", len(pos), pos)
         if len(pos) == 1:
             break
         screen.focus()
+        if(char!=None):
+            ms_util.click_first(char)
+            time.sleep(0.5)
         kb_util.space(1, 0.1)
         pos = find_pos_main( 'home', 'start.png')
         logging.debug("start:%d,%s", len(pos), pos)
         if len(pos) >=1:
-            # ms_util.click_first(pos)
             pass
         else:
             break
@@ -613,21 +828,29 @@ def main_task():
         posz = None
         while gcf.Gcfg.running:
             kb_util.f1(delay=0.5)
-            posz = find_pos_main( 'task', 'yiwancheng.png')
+            posz = find_pos_param(0,0,360,300, 'task', 'yiwancheng.png')
             logging.debug("yiwancheng task:%d,%s", len(posz), posz)
             if len(posz) == 1:
                 task = 'yiwancheng'
                 logging.info("yiwancheng task find:%d,%s", len(posz), posz)
                 return task
 
-            posz = find_pos_main( 'task', 'zhuanzhi.png')
+            posz = find_pos_param(0,0,360,300, 'task', 'zhuanzhi.png')
             logging.debug("zhuanzhi task:%d,%s", len(posz), posz)
             if len(posz) == 1:
                 task='zhuanzhi'
                 logging.info("zhuanzhi task find:%d,%s", len(posz), posz)
                 break
 
-            posz = find_pos_main( 'task', 'zhuxian1.png')
+            posz = find_pos_param(0,0,360,300,'task', 'shoudong1.png')
+            logging.debug("shoudong1 task:%d,%s", len(posz), posz)
+            if len(posz) == 1:
+                task = 'shoudong1'
+                logging.info("shoudong1 task find:%d,%s", len(posz), posz)
+                return task
+
+
+            posz = find_pos_param(0,0,360,300,'task', 'zhuxian1.png')
             logging.debug("main task:%d,%s", len(posz), posz)
             if len(posz) == 1:
                 logging.info("main task find:%d,%s", len(posz), posz)
@@ -635,24 +858,27 @@ def main_task():
             # esc_clear()
             clear_menu()
 
-        while gcf.Gcfg.running:
+        count=0
+        while gcf.Gcfg.running and count<5:
             ms_util.click_first(posz)
             pos = find_pos_main('task', 'zhuxian2.png')
             logging.debug("task direction:%d,%s", len(pos), pos)
             if len(pos) == 1:
                 ms_util.click_first(pos)
                 break
+            count = count+1
             clear_space()
             clear_confirm()
-            time.sleep(1)
+            time.sleep(0.5)
 
-        # esc_clear()
-        clear_menu()
+
+        sure_no_task_menu()
         posq = find_pos_main('direction', 'qianjin.png')
         logging.debug("direction:%d,%s", len(posq), posq)
         if len(posq) == 1:
             logging.info("find direction:%d,%s", len(posq), posq)
             break
+        left_v3(300)
 
     return task
 
@@ -724,10 +950,44 @@ def zhuanzhi_dialog():
                 break
 
         clear_menu()
+        # esc_clear()
 
 
-        esc_clear()
+def zhuanzhi_dialog_guijiansi():
+    pos = find_pos_main('task', 'zhuanzhi.png')
+    logging.debug("zhuanzhi:%d,%s", len(pos), pos)
+    pos2 = None
+    pos3 = None
+    pos4 = None
+    if len(pos) == 1:
+        while gcf.Gcfg.running:
+            ms_util.click_first(pos)
+            time.sleep(2)
+            pos2 = find_pos_main('task', 'zhuanzhi_step2_guijiansi.png')
+            if len(pos2) == 1:
+                break
+    else:
+        logging.error("no zhuanzhi")
+        return
 
+    while gcf.Gcfg.running:
+        logging.debug("zhuanzhi zu feng zhe:%d,%s", len(pos), pos)
+        ms_util.click_first(pos2)
+        time.sleep(2)
+        pos3 = find_pos_main('task', 'zhuanzhi_step3.png')
+        if len(pos3) == 1:
+            break
+
+    while gcf.Gcfg.running:
+        logging.debug("zhuanzhi zu feng zhe:%d,%s", len(pos), pos)
+        ms_util.click_first(pos3)
+
+        pos4 = find_pos_main('clear', 'kongge.png')
+        if len(pos4) == 1:
+            break
+
+    clear_menu()
+    # esc_clear()
 
 def my_pos():
     pos = find_pos_finish('task', 'me.png')
@@ -789,33 +1049,70 @@ def goto_fight():
     wait_mission()
 
 
-def follow_direction():
+def jiejin_until(obj):
+    s=time.time()
+    count=0
     while gcf.Gcfg.running:
-        # screen.focus()
+        if time.time()-s > 15:
+            break
+        img=capture_main()
+        pos = ac.find_all_template(img, obj, threshold=0.85)
+        logging.debug("jiejin_until obj:%d,%s",len(pos),pos)
+        if len(pos)==1:
+            goto_xy_home_dialog(pos[0]['result'][0], pos[0]['result'][1])
+            time.sleep(0.5)
+            img = capture_main()
+            pos = ac.find_all_template(img, obj, threshold=0.85)
+            if len(pos) == 0:
+                kb_util.space()
+                time.sleep(0.5)
+                return
+        else:
+            count=count+1
+            if count<4:
+                continue
+            kb_util.space()
+            time.sleep(0.5)
+            return
+
+
+def follow_direction():
+    logging.info("follow_direction")
+    s=time.time()
+    sd = None
+    while gcf.Gcfg.running:
+        if time.time()-s>5:
+            screen.focus()
+            s=time.time()
         me=where_am_i_home()
-        pos = find_pos_main( 'direction', 'qianjin.png')
+        pos = find_pos_main( 'direction', 'qianjin.png',td=0.5)
         if len(pos) == 0:
             pos = find_pos_main("task", "mission_g.png")
             if len(pos) > 0:
                 logging.info("in mission")
                 return 'mission'
             else:
-                img = capture_main()
-                pos = ac.find_all_template(img, mcfg.TASK_JIEJIN, threshold=0.9)
-                if len(pos)==1:
-                    tm=None
-                    while gcf.Gcfg.running:
-                        ms_util.click(pos[0]['result'][0], pos[0]['result'][1]+80)
-                        tm = capture_main()
-                        tp = ac.find_all_template(tm, mcfg.TASK_CLOSE, threshold=0.9)
-                        if len(tp) == 1:
-                            break
+                # img = capture_main()
+                # pos = ac.find_all_template(img, mcfg.TASK_JIEJIN, threshold=0.9)
+                # if len(pos)==1:
+                #     tm=None
+                    # while gcf.Gcfg.running:
+                    #     ms_util.click(pos[0]['result'][0], pos[0]['result'][1]+80)
+                    #     tm = capture_main()
+                    #     tp = ac.find_all_template(tm, mcfg.TASK_CLOSE, threshold=0.9)
+                    #     if len(tp) == 1:
+                    #         break
 
-                    tp = find_pos_main('task', 'zhuanzhi.png')
-                    if len(tp) == 1:
-                        logging.info("in zhuanzhi")
-                        return  'zhuanzhi'
-
+                jiejin_until(mcfg.TASK_JIEJIN)
+                tp = find_pos_main('task', 'zhuhe.png')
+                if len(tp) == 1:
+                    logging.info("in zhuhe")
+                    ms_util.click_first(tp)
+                    return  'dialog'
+                tp = find_pos_main('task', 'zhuanzhi.png')
+                if len(tp) == 1:
+                    logging.info("in zhuanzhi")
+                    return  'zhuanzhi'
                 if in_home_v2():
                     logging.info("in dialog")
                     return 'dialog'
@@ -825,11 +1122,37 @@ def follow_direction():
         if len(me)==0:
             continue
 
-        d=screen.direction(pos)
-        if d==1 or d==3:
-            goto_xy_home_no(pos[0]['result'][0],pos[0]['result'][1],me[0])
+        img=capture_main()
+        pos = ac.find_all_template(img, mcfg.TASK_JIEJIN, threshold=0.85)
+        if len(pos)==1:
+            logging.info("task jiejin")
+            jiejin_until(mcfg.TASK_JIEJIN)
+            return 'dialog'
+
+        ss=time.time()
+        while gcf.Gcfg.running:
+            if time.time()-ss>5:
+                screen.focus()
+                ss=time.time()
+            d = direction()
+            if d== None and sd !=None:
+                d=sd
+            if d!=None:
+                break;
+            left_v3(50)
+
+        pos = find_pos_main('task','kaiqijineng.png')
+        if len(pos) > 0:
+            learn_skill_guijiansi()
+            clear_menu()
+
+        if d!= None:
+            sd = d
+        logging.info("direction:%d,%s", d[0], d[1])
+        if d[0] == 1 or d[0] == 3:
+            goto_xy_home_y_dir(d[1][0]['result'][0], d[1][0]['result'][1], me[0], d[0])
         else:
-            goto_xy_home(pos[0]['result'][0],pos[0]['result'][1],me[0])
+            goto_xy_home_x_dir(d[1][0]['result'][0], d[1][0]['result'][1], me[0], d[0])
 
 
 def goto_zhuanzhi():
@@ -923,11 +1246,29 @@ def goto_xy(x,y,me=None):
     else:
         right_v2(-dx*1.5)
 
+def goto_xy_v3(x,y,me=None):
+    cp=me
+    if me== None:
+        cp=where_am_i()[0]
+    dx=cx(cp)-x
+    dy=cy(cp)-y
+
+    if dx > 0:
+        left_v3(dx*1.5)
+    else:
+        right_v3(-dx*1.5)
+    if dy>0:
+        up_v3(dy*1.25)
+    else:
+        down_v3(-dy*1.25)
+
 
 def goto_xy_home(x,y,me=None):
     cp=me
     if me== None:
         cp=where_am_i_home()[0]
+        if cp==None:
+            return
     middle_v2_p(cp)
     dx=cx(cp)-x
     # dy=cy(cp)-y+40
@@ -941,22 +1282,149 @@ def goto_xy_home(x,y,me=None):
     else:
         down_v2(-dy)
 
-def goto_xy_home_no(x,y,me=None):
+def goto_xy_home_v3(x, y, me=None):
     cp=me
     if me== None:
         cp=where_am_i_home()[0]
+        if cp==None:
+            return
+    middle_v2_p(cp)
+    dx=cx(cp)-x
+    # dy=cy(cp)-y+40
+    dy=mcfg.FIGHT_MIDDLE-y
+    if dx > 0:
+        left_v3(dx+80)
+    else:
+        right_v3(-dx+80)
+    if dy>0:
+        up_v3(dy)
+    else:
+        down_v3(-dy)
+
+def goto_xy_home_dialog(x, y, me=None):
+    cp=me
+    if me== None:
+        pos=where_am_i_home()
+        if pos == None:
+            return
+        cp=where_am_i_home()[0]
+    dx=cx(cp)-x
+    dy=cy(cp)-(y+180)
+    count=1
+    for i in range(0,count):
+        if dx > 0:
+            left_v2(dx/count)
+        else:
+            right_v2(-dx/count)
+        if dy>0:
+            up_v3(dy/count)
+        else:
+            down_v3(-dy/count)
+
+def goto_xy_home_no(x,y,me=None,d=None):
+    cp=me
+    if me== None:
+        cp=where_am_i_home(100)[0]
+        if cp==None:
+            return
+    middle_v2_p(cp)
+    dx=cx(cp)-x
+    # dy=cy(cp)-y+40
+    dy=mcfg.FIGHT_MIDDLE-y
+    if dx > 0:
+        left_v2(dx)
+    else:
+        right_v2(-dx)
+    if d!=None:
+        if d==1:
+            up_v2(dy + 50)
+            up_v2(dy + 50)
+        elif d==3:
+            down_v2(-dy + 50)
+            up_v2(dy + 50)
+    else:
+        if dy>0:
+            up_v2(dy)
+        else:
+            down_v2(-dy)
+
+def goto_xy_home_x_dir(x,y,me=None,d=None):
+    logging.debug("goto_xy_home_x_dir")
+    cp=me
+    if me== None:
+        cp=where_am_i_home(5)[0]
+        if cp==None:
+            return
+    middle_v2_p(cp)
+    dx=cx(cp)-x
+    # dy=cy(cp)-y+40
+    dy=mcfg.FIGHT_MIDDLE-y
+    if dx > 0:
+        if dx>300:
+            left_v3(200)
+        left_v3(dx+40)
+    else:
+        if -dx >300:
+            right_v3(200)
+        right_v3(-dx+40)
+
+    # if dy>0:
+    #     up_v3(dy)
+    # else:
+    #     down_v3(-dy)
+
+
+def goto_xy_home_y_dir(x,y,me=None,d=None):
+    logging.debug("goto_xy_home_y_dir")
+    cp=me
+    if me== None:
+        cp=where_am_i_home(5)[0]
+        if cp==None:
+            return
+    middle_v2_p(cp)
+    dx=cx(cp)-x
+    # dy=cy(cp)-y+40
+    dy=mcfg.FIGHT_MIDDLE-y
+    if dx > 0:
+        left_v3(dx)
+    else:
+        right_v3(-dx)
+    if d!=None:
+        if d==1:
+            up_v3(dy + 80)
+        elif d==3:
+            down_v3(-dy + 80)
+    else:
+        if dy>0:
+            up_v3(dy)
+        else:
+            down_v3(-dy)
+
+def goto_xy_home_no_v3(x,y,me=None,d=None):
+    logging.debug("goto_xy_home_no_v3")
+    cp=me
+    if me== None:
+        cp=where_am_i_home()[0]
+        if cp==None:
+            return
     middle_v2_p(cp)
     dx=cx(cp)-x
     # dy=cy(cp)-y+40
     dy=mcfg.FIGHT_MIDDLE-y+40
     if dx > 0:
-        left_v2(dx)
+        left_v3(dx)
     else:
-        right_v2(-dx)
-    if dy>0:
-        up_v2(dy)
+        right_v3(-dx)
+    if d!=None:
+        if d==1:
+            up_v3(dy + 100)
+        elif d==3:
+            down_v3(-dy + 100)
     else:
-        down_v2(-dy)
+        if dy>0:
+            up_v3(dy)
+        else:
+            down_v3(-dy)
 
 def goto_fight_in_mission():
     while gcf.Gcfg.running:
@@ -994,7 +1462,11 @@ def wait_mission():
         time.sleep(0.2)
 
 def wait_in_mission():
+    s=time.time()
     while gcf.Gcfg.running:
+        if time.time()-s>5:
+            s=time.time()
+            screen.focus()
         kb_util.space(1, 0.1)
         img = capture_param(
             mcfg.MINI_MAP_X - 7 * mcfg.MINI_MAP_SLOT_SIZE,
@@ -1010,8 +1482,46 @@ def wait_in_mission():
         if len(pos) > 0:
             return
 
-def wait_in_main():
+def learn_skill_guijiansi():
+
+    ic=None
     while gcf.Gcfg.running:
+        kb_util.skill('k', 1, 0.2)
+        img = capture_main()
+        ic = ac.find_all_template(img, mcfg.SKILL_PAGE, threshold=0.9)
+        if len(ic)==1:
+            break
+        ops_util.clear_menu()
+    time.sleep(0.5)
+
+    skill_pos=[(100,150),(180,150),(220,150),(260,150),(310,150),(350,150),(390,150),(430,150),(470,150),(190,220),(290,220),(145,280),(335,280),(425,280),(50,350),(95,350),(50,420),(95,420),(145,420),(245,420),(425,420),(470,420),(525,420),(145,485)]
+    for p in skill_pos:
+        ms_util.move_and_click(p[0], p[1])
+        time.sleep(0.3)
+        img = capture_main()
+        pos = ac.find_all_template(img, mcfg.SKILL_LEARN, threshold=0.98)
+        logging.debug("skill：%s", pos)
+        if len(pos) == 1:
+            ms_util.click_first(pos)
+        time.sleep(0.3)
+
+    ms_util.click(210, 560)
+    time.sleep(1)
+    clear_confirm()
+
+    while gcf.Gcfg.running:
+        kb_util.skill('k', 1, 0.2)
+        img = capture_main()
+        ic = ac.find_all_template(img, mcfg.SKILL_PAGE, threshold=0.9)
+        if len(ic) == 0:
+            break
+
+def wait_in_main():
+    s=time.time()
+    while gcf.Gcfg.running:
+        if time.time()-s>5:
+            s=time.time()
+            screen.focus()
         pos=find_pos_main("task","find_main.png")
         if len(pos)>0:
             return 'zhuxian'
@@ -1020,6 +1530,12 @@ def wait_in_main():
             return 'zhuanzhi'
         kb_util.down(1)
         time.sleep(0.2)
+
+        pos = find_pos_main('task','kaiqijineng.png')
+        if len(pos) > 0:
+            learn_skill_guijiansi()
+
+
 
 def wait_in_zhuanzhi():
     while gcf.Gcfg.running:
@@ -1030,14 +1546,20 @@ def wait_in_zhuanzhi():
         time.sleep(0.2)
 
 def finish_yiwancheng():
-    posz = find_pos_main('task', 'yiwancheng.png')
-    logging.debug("yiwancheng task:%d,%s", len(posz), posz)
-    if len(posz) == 1:
-        ms_util.click_first(posz)
-        clear_space()
-        # kb_util.space(10,0.1)
-        # time.sleep(0.5)
-        clear_confirm()
+    s=time.time()
+    while gcf.Gcfg.running:
+        if time.time()-s>15:
+            break
+        posz = find_pos_param(0,0,360,300,'task', 'yiwancheng.png')
+        logging.debug("yiwancheng task:%d,%s", len(posz), posz)
+        if len(posz) == 1:
+            ms_util.click_first(posz)
+            ms_util.click_first(posz)
+            clear_space()
+            clear_confirm()
+            clear_menu_no_finish()
+        else:
+            break
 
 
 def wait_till_next_mission():
@@ -1058,7 +1580,11 @@ def wait_till_next_mission_and_home():
         time.sleep(0.2)
 
 def clear_to_mission():
+    s = time.time()
     while gcf.Gcfg.running:
+        if time.time()-s>5:
+            s=time.time()
+            screen.focus()
         pos=find_pos_main("task","renwuwancheng.png")
         logging.info("clear_to_mission:%s",pos)
         if len(pos)==1:
@@ -1066,12 +1592,18 @@ def clear_to_mission():
         clear_menu()
 
 def mission_to_home():
+    s=time.time()
     while gcf.Gcfg.running:
+        if time.time()-s>5:
+            s=time.time()
+            screen.focus()
         pos=find_pos_main("task","renwuwancheng.png")
         logging.info("mission_to_home:%s",pos)
         if len(pos)==0:
-            return
-        kb_util.skill('F12')
+            while gcf.Gcfg.running:
+                if in_home_v2():
+                    return
+        kb_util.skill('F12',delay=0.2)
 
 
 
@@ -1183,11 +1715,12 @@ def img_diff():
     print(pos)
 
 def in_home_v2():
-    pos = find_pos_finish('home', 'in_home_v2.png',td=0.9)
-    logging.info("in_home_v2:%s",pos)
+    time.sleep(0.2)
+    pos = find_pos_param(700,0,100,50, 'home','in_home_v2.png',td=0.7)
+    logging.info("in_home_v2:%s", pos)
     if len(pos)>0:
-        return False
-    return True
+        return True
+    return False
 
 def in_home():
     goto_menu()
@@ -1198,6 +1731,34 @@ def in_home():
         return False
     return True
 
+def direction():
+    logging.debug("direction")
+    img = capture_main()
+    # ac.show(img)
+    posl = ac.find_all_template(img, mcfg.ITEM_LEFT, threshold=0.7, rgb=True, bgremove=False)
+    if len(posl)==1:
+        logging.info("left:%s", posl)
+        return (0,posl)
+    posr= ac.find_all_template(img, mcfg.ITEM_RIGHT, threshold=0.7, rgb=True, bgremove=False)
+    if len(posr)==1:
+        logging.info("right:%s", posr)
+        return (2,posr)
+    # ac.show(upimg)
+    posu = ac.find_all_template(img, mcfg.ITEM_UP, threshold=0.7, rgb=True, bgremove=False)
+    if len(posu)==1:
+        logging.info("up:%s", posu)
+        return (1,posu)
+    posu = ac.find_all_template(img, mcfg.ITEM_UP11, threshold=0.7, rgb=True, bgremove=False)
+    if len(posu)==1:
+        logging.info("up:%s", posu)
+        return (1,posu)
+    posd = ac.find_all_template(img, mcfg.ITEM_DOWN, threshold=0.6, rgb=True, bgremove=False)
+    if len(posd)==1:
+        logging.info("down:%s", posd)
+        return (3,posd)
+
+    logging.warn("no direction")
+    return None
 
 
 if __name__ == "__main__":
@@ -1205,7 +1766,75 @@ if __name__ == "__main__":
     # screen.Screen.init()
     screen.Screen.init_dummp()
     screen.focus()
-    right_fight(400)
+
+    kb_util.skill('s', 1, delay=0.65)
+    kb_util.skill('x', 4, delay=0.25)
+    time.sleep(2)
+    kb_util.skill('q', 1, delay=0.65)
+    kb_util.skill('x', 3, delay=0.25)
+    exit(0)
+    char = cv2.imread(resource_path('characters','my_pos1.0.png'))
+    #148 185 209
+    bm = np.ndarray((char.shape[1]),dtype=np.uint8)
+    for i in range(0,bm.shape[0]):
+        bm[i]=0
+    for i in range(0,char.shape[1]):
+        for j in range(0,char.shape[0]):
+            print(char[j][i][0],char[j][i][1],char[j][i][2])
+            if char[j][i][0]==148 and char[j][i][1]==185 and char[j][i][2]==209:
+                bm[i]=1
+        print('\n')
+
+    start=0
+    end=char.shape[1]-1
+
+    lv_got = False
+    space_got = False
+    for i in range(1,bm.shape[0]-1):
+        if not lv_got:
+            if bm[i-1]==0 and bm[i]==1:
+                lv_got=True
+        else:
+            if not space_got:
+                if bm[i - 1] == 0 and bm[i] == 0:
+                    space_got=True
+            else:
+                if bm[i - 1] == 0 and bm[i] == 1:
+                    if start==0:
+                        start=i
+                elif bm[i - 1] == 0 and bm[i] == 0:
+                    if start!=0:
+                        end=i-2
+                        break
+
+    res=np.ndarray((char.shape[0],end-start+1,char.shape[2]),char.dtype)
+    for i in range(0,res.shape[1]):
+        for j in range(0,res.shape[0]):
+            res[j][i][0] = char[j][i+start][0]
+            res[j][i][1] = char[j][i+start][1]
+            res[j][i][2] = char[j][i+start][2]
+    ac.show(res)
+    # ac.show(char)
+    print(start,end)
+
+    img = capture_main()
+    pos = ac.find_all_template(img, res, 0.5)
+    logging.debug("%s",pos)
+
+
+
+
+
+
+
+
+
+    exit(0)
+
+    screen.Screen.init_dummp()
+    screen.focus()
+    direction()
+    # right_fight(400)
     # logging.debug("in home:%d",in_home())
     # zhuanzhi_task()
     # goto_zhuanzhi()

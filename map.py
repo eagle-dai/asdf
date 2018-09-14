@@ -86,6 +86,14 @@ def position_start_end_diff():
     logging.debug('position_start_end_diff:%d,%d',x,y)
     return int(x),int(y)
 
+def xy(s,e):
+    x = (s['result'][0] - e['result'][0]) / 18
+    y = (s['result'][1] - e['result'][1]) / 18
+    x += 10
+    y += 10
+    return int(x), int(y)
+
+
 def xy_me():
     e=position_final()
     s=position_me_n()
@@ -96,7 +104,7 @@ def xy_me():
         y=(s['result'][1]-e['result'][1])/18
         x+=10
         y+=10
-        logging.debug('xy_me:%d,%d',x,y)
+        # logging.debug('xy_me:%d,%d',x,y)
         return int(x),int(y)
 
 
@@ -159,9 +167,11 @@ def position_final_n():
             return None
 
 def check_path():
+    logging.info("check_path")
     res=None
     while gcf.Gcfg.running:
-        pos=ops_util.find_pos_main('task','map.png',td=0.9)
+        pos=ops_util.find_pos_main('task','map.png',td=0.7)
+        logging.info("path:%s",pos)
         if len(pos)==2:
             break
         kb_util.skill('n',delay=0.1)
@@ -312,7 +322,7 @@ def check_path():
         gen_path(ra,dx+10,dy+10,path,ps)
         logging.debug("check path:%s", ps)
         for p in ps:
-            if len(p)<4:
+            if len(p)<4 and len(p)!=1:
                 continue
             if res==None:
                 res=p
@@ -330,7 +340,7 @@ def check_path():
     kb_util.skill('n', delay=0.1)
     time.sleep(1)
     while gcf.Gcfg.running:
-        pos=ops_util.find_pos_main('task','map.png',td=0.9)
+        pos=ops_util.find_pos_main('task','map.png',td=0.7)
         posf=position_final_n()
         if len(pos)==1 and posf!=None:
             break

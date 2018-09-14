@@ -41,5 +41,12 @@ def find_pos_finish(*args, td = 0.65):
     pos = ac.find_all_template(img, obj, threshold=td)
     return pos
 
+
+def find_pos_param(x,y,w,d,*args, td = 0.65):
+    img = capture_param(x,y,w,d)
+    obj = ac.imread(resource_path(*args))
+    pos = ac.find_all_template(img, obj, threshold=td)
+    return pos
+
 def test_log():
     logging.debug("%s", "in test log")
